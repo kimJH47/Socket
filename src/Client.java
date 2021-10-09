@@ -60,7 +60,8 @@ public class Client { //chatServer 가 통신일 하기위해 Client 클래스�
                 byte[] buffer = message.getBytes("UTF-8");
                 out.write(buffer);
                 out.flush();
-
+                    System.out.println("[message send Success]"
+                            + socket.getRemoteSocketAddress() + ":" + Thread.currentThread().getName());
                 } catch (Exception e) {
                     try {
                         System.out.println("[message send error]"

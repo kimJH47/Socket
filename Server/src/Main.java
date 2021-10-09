@@ -77,7 +77,7 @@ public class Main {
     //main 시작점
     public static void main(String[] args) {
         Main me = new Main();
-        me.startServer("127.0.0.1",9870);
+        me.startServer("220.89.50.33",9000);
 
     }
 }

@@ -1,6 +1,4 @@
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
+import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ExecutorService;
@@ -13,23 +11,41 @@ public class Main {
     //클라이언트 동작 메서드
     public void startClient(String IP, int port) {
 
-        Runnable thread = new Runnable() {
+
+        Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
                     socket = new Socket(IP, port);
                     System.out.println("chat start");
                     receive();
-
                 } catch (Exception e) {
                     stopClient();
                     e.printStackTrace();
                 }
-            }
-        };
 
-        Thread thread1 = new Thread(thread);
-        thread1.start();
+            }
+        });
+        Thread tr2 = new Thread(new Runnable() {
+            @Override
+            public void run() {
+
+
+                while (true){
+                    try{
+                        BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+                        send(bufferedReader.readLine());
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                        break;
+                    }
+
+                }
+            }
+        });
+        thread.start();
+        tr2.start();
 
     }
 
@@ -61,6 +77,7 @@ public class Main {
             } catch (Exception e) {
                 stopClient();
                 e.printStackTrace();
+                break;
 
             }
         }
@@ -70,7 +87,7 @@ public class Main {
 
     //전송메서드
     public void send(String message) {
-        Thread thread = new Thread() {
+        Thread thread2 = new Thread() {
             @Override
             public void run() {
                 try {
@@ -78,6 +95,7 @@ public class Main {
                     byte[] buffer;
                     buffer = message.getBytes("UTF-8");
                     out.write(buffer);
+                    System.out.println("message send");
                     out.flush();
 
                 } catch (Exception e) {
@@ -88,13 +106,15 @@ public class Main {
 
             }
         };
+        thread2.start();
 
     }
 
     public static void main(String[] args) {
 
         Main me = new Main();
-        me.startClient("127.0.0.1",9870);
+        me.startClient("220.89.50.33",9000);
+
 
 
     }
