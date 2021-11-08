@@ -1,3 +1,5 @@
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -19,13 +21,12 @@ public class RoomManager {
     public void addClient(Client client) {
 
         this.clients.add(client);
-        System.out.println("대기열 추가 :" + client.name + client.socket.getInetAddress());
+        System.out.println("대기열 추가 :" + client.getName() + client.socket.getInetAddress());
         users++;
         if (users % 2 == 0)
             createRoom(clients);
 
     }
-
     public void createRoom(Queue<Client> clients) {
         //방만들기 수정필요
         System.out.println("Room 생성");

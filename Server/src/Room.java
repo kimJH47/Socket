@@ -24,8 +24,12 @@ public class Room {
     public void sendClients(String message){
 
     }
-    public void send(){
+    public void send(String msg){
+        Iterator<Client> clientIterator = clients.iterator();
 
+        while (clientIterator.hasNext()){
+            clientIterator.next().send(msg);
+        }
     }
 
 

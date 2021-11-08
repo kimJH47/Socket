@@ -1,16 +1,17 @@
-public class LoginData implements Protocol{
-    private static final long serialVersionUID =1L;
+public class LoginData implements Protocol {
+    private static final long serialVersionUID = 1L;
 
     private String ID;
     private String passWord;
     private String name;
     private short protocol;
 
-    public LoginData(String ID, String passWord,short protocol){
+    public LoginData(String ID, String passWord, short protocol) {
         this.ID = ID;
         this.passWord = passWord;
-        this.protocol=protocol;
+        this.protocol = protocol;
     }
+
     @Override
     public short getProtocol() {
         return protocol;
@@ -20,7 +21,12 @@ public class LoginData implements Protocol{
     public String getName() {
         return ID;
     }
-    public String getPassWord(){
+
+    public String getID() {
+        return ID;
+    }
+
+    public String getPassWord() {
         return passWord;
     }
 

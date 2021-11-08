@@ -1,19 +1,30 @@
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.OutputStream;
+import javax.swing.*;
+import java.io.*;
 import java.net.Socket;
+import java.net.SocketException;
 
 public class Client {
 
 
     Socket socket;
-    Room room;
-    String ID = ""; // 직렬화로 추가하기
-    String name = new String("Unknown");
+    private Room room;
+    private String ID = ""; // 직렬화로 추가하기
+    private String name = new String("");
+    private boolean joinFlag = false; // 대기열입장여부
+    private Protocol protocol;
+    private ObjectInputStream in;
+    private ObjectOutputStream out;
 
     public Client(Socket socket) {
         this.socket = socket;
+        try {
+            in = new ObjectInputStream(socket.getInputStream());
+            out = new ObjectOutputStream(socket.getOutputStream());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        receive();
 
 
     }
@@ -21,7 +32,6 @@ public class Client {
     public void enterRoom(Room room) {
         //방입장
         this.room = room;
-        //receive();
 
     }
 
@@ -34,7 +44,6 @@ public class Client {
     public void wait_queue() {
         //미구현
         while (room == null) {
-            System.out.println();
         }
     }
 
@@ -46,17 +55,28 @@ public class Client {
             public void run() {
                 try {
                     while (true) {
-                        InputStream in = socket.getInputStream();
-                        byte[] buffer = new byte[512];
-                        int length = in.read(buffer);
-                        while (length == -1) throw new IOException();
-                        System.out.println("[message received]" + socket.getRemoteSocketAddress() + ":"
-                                + Thread.currentThread().getName()
-                        );
-                        String message = new String(buffer, 0, length, "UTF-8");
-                        for (Client client : room.clients) {
-                            client.send(message);
+                        try {
+                            protocol = (Protocol) in.readObject();
+                            System.out.println("[message received]" + socket.getRemoteSocketAddress() + ":"
+                                    + Thread.currentThread().getName() + ":" + protocol);
+                        } catch (ClassNotFoundException e) {
+                            e.printStackTrace();
+                        } catch (EOFException e) {
+                            continue;
+                        } catch (SocketException e) {
+                            break;
                         }
+                        if (protocol instanceof ChatData) {
+
+                        } else if (protocol instanceof LoginData) {
+                            analysisLoginData((LoginData) protocol);
+
+                        } else if (protocol instanceof SignUpData) {
+
+                        } else if (protocol instanceof JoinData) {
+
+                        }
+
                     }
                 } catch (Exception e) {
                     try {
@@ -69,6 +89,29 @@ public class Client {
             }
         };
         Main.threadPool.submit(thread);
+
+    }
+
+    public void analysisLoginData(LoginData data) {
+        String ID = data.getID();
+        String passWord = data.getPassWord();
+        try {
+            if (Main.DAO.signIn(ID, passWord)) {
+                out.writeObject(new JoinData(true, JoinData.LOGIN_ACCESS));
+            } else {
+                out.writeObject(new JoinData(true, JoinData.LOGIN_FAILED));
+            }
+            out.flush();//?
+
+
+        } catch (Exception e) {
+            try{
+                out.writeObject(new JoinData(true, JoinData.LOGIN_FAILED));
+                e.printStackTrace();
+            }catch (Exception e1){
+                   e1.printStackTrace();
+            }
+        }
 
     }
 
@@ -100,5 +143,7 @@ public class Client {
 
     }
 
-
+    public String getName() {
+        return name;
+    }
 }
