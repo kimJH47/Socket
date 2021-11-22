@@ -14,7 +14,7 @@ public class Client { //chatServer 가 통신일 하기위해 Client 클래스�
 
     public Client(Socket socket) {
         this.socket = socket;
-        receive();
+
     }
 
     public void receive() {
